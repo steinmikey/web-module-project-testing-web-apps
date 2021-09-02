@@ -48,21 +48,89 @@ test("renders THREE error messages if user enters no values into any fields.", a
 });
 
 test("renders ONE error message if user enters a valid first name and last name but no email.", async () => {
-  render();
+  render(<ContactForm />);
+
+  //   const firstNameInput = screen.getByLabelText("First Name*");
+  //   userEvent.type(firstNameInput, "misha");
+  //   const lastNameInput = screen.getByLabelText("Last Name*");
+  //   userEvent.type(lastNameInput, "s");
+
+  //   await waitFor(() => {
+  //     const errorMessage = screen.getByText(/Error:/i);
+  //     expect(errorMessage).toBeInTheDocument();
+  //   });
 });
 
 test('renders "email must be a valid email address" if an invalid email is entered', async () => {
-  render();
+  render(<ContactForm />);
+
+  const emailInput = screen.getByLabelText("Email*");
+  userEvent.type(emailInput, "thisshouldntwork.com");
+
+  await waitFor(() => {
+    const errorMessage = screen.getByText(/email must be a valid email address/i);
+    expect(errorMessage).toBeInTheDocument();
+  });
 });
 
 test('renders "lastName is a required field" if an last name is not entered and the submit button is clicked', async () => {
-  render();
+  render(<ContactForm />);
+
+  const firstNameInput = screen.getByLabelText("First Name*");
+  userEvent.type(firstNameInput, "misha");
+  const emailInput = screen.getByLabelText("Email*");
+  userEvent.type(emailInput, "thisemail@shouldwork.com");
+  const submitButton = screen.getByRole("button");
+  userEvent.click(submitButton);
+
+  await waitFor(() => {
+    const errorMessage = screen.getByText(/lastName is a required field/i);
+    expect(errorMessage).toBeInTheDocument();
+  });
 });
 
 test("renders all firstName, lastName and email text when submitted. Does NOT render message if message is not submitted.", async () => {
-  render();
+  render(<ContactForm />);
+
+  const firstNameInput = screen.getByLabelText("First Name*");
+  userEvent.type(firstNameInput, "misha");
+  const lastNameInput = screen.getByLabelText("Last Name*");
+  userEvent.type(lastNameInput, "s");
+  const emailInput = screen.getByLabelText("Email*");
+  userEvent.type(emailInput, "thisemail@shouldwork.com");
+  const submitButton = screen.getByRole("button");
+  userEvent.click(submitButton);
+  //   const messageInput = screen.getByLabelText("Message");
+  //   userEvent.type(messageInput, "this should make the test fail");
+
+  await waitFor(() => {
+    const messageField = screen.queryByText(/Message:/i);
+    expect(messageField).not.toBeInTheDocument();
+  });
 });
 
 test("renders all fields text when all fields are submitted.", async () => {
-  render();
+  render(<ContactForm />);
+
+  const firstNameInput = screen.getByLabelText("First Name*");
+  userEvent.type(firstNameInput, "misha");
+  const lastNameInput = screen.getByLabelText("Last Name*");
+  userEvent.type(lastNameInput, "s");
+  const emailInput = screen.getByLabelText("Email*");
+  userEvent.type(emailInput, "thisemail@shouldwork.com");
+  const messageInput = screen.getByLabelText("Message");
+  userEvent.type(messageInput, "this should not make the test fail");
+  const submitButton = screen.getByRole("button");
+  userEvent.click(submitButton);
+
+  await waitFor(() => {
+    const firstnameDisplay = screen.queryByTestId("firstnameDisplay");
+    expect(firstnameDisplay).toBeInTheDocument();
+    const lastnameDisplay = screen.queryByTestId("lastnameDisplay");
+    expect(lastnameDisplay).toBeInTheDocument();
+    const emailDisplay = screen.queryByTestId("emailDisplay");
+    expect(emailDisplay).toBeInTheDocument();
+    const messageDisplay = screen.queryByTestId("messageDisplay");
+    expect(messageDisplay).toBeInTheDocument();
+  });
 });
